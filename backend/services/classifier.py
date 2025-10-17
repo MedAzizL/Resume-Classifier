@@ -29,8 +29,8 @@ class ResumeClassifier:
             
         except Exception as e:
             print(f"Could not load fine-tuned model ({str(e)}), using zero-shot classification")
-            from transformers import pipeline
-            self.zero_shot_classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+            # Don't download model on startup - do it lazily
+            self.zero_shot_classifier = None
             self.use_zero_shot = True
     
     def classify(self, text: str, top_k: int = 3) -> Dict:
@@ -70,6 +70,13 @@ class ResumeClassifier:
         }
     
     def _classify_zero_shot(self, text: str, top_k: int = 3) -> Dict:
+        # Lazy load the model only when needed
+        if self.zero_shot_classifier is None:
+            print("Loading zero-shot model...")
+            from transformers import pipeline
+            self.zero_shot_classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+            print("Zero-shot model loaded!")
+        
         max_length = 1024
         if len(text) > max_length:
             text = text[:max_length]
