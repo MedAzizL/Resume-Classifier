@@ -18,7 +18,7 @@ class ResumeClassifier:
         try:
             print("Loading fine-tuned model...")
             self.tokenizer = AutoTokenizer.from_pretrained('./models/resume-classifier')
-            self.session = ort.InferenceSession('./models/resume-classifier/model.onnx')
+            self.session = ort.InferenceSession('./models/resume-classifier/model_quantized.onnx')
             
             import joblib
             label_encoder = joblib.load('./models/resume-classifier/label_encoder.pkl')
